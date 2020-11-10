@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Interfaces;
 
-class ConsoleController
+use App\Application\Commands\CommandInput;
+use App\Application\Commands\CommandFactory;
+use App\Application\Commands\Enum\ApiActions;
+
+class Console
 {
 	private $running = false;
 	private $inputLine;
-	private $factory;
 
 	public function run()
 	{
@@ -14,10 +17,11 @@ class ConsoleController
 		while ($this->isRunning()) {
 	      	$this->output(' > ', false);
 		    $this->readLine();
-		    if ("QUIT" == $this->inputLine) {
+		    if (ApiActions::EXIT == strtoupper($this->inputLine)) {
 			    $this->stop();
 		    } else {
-		    	$this->execute();
+		    	$response = $this->execute();
+		    	$this->output($response);
 		    }
 		}
 	}
@@ -25,10 +29,13 @@ class ConsoleController
 	public function execute()
 	{
 		try {
-			// 
+			$commandInput = new CommandInput($this->inputLine);
+			$response = CommandFactory::getCommandFromInput($commandInput)->execute();
 		} catch (\Exception $e) {
 			$this->output($e->getMessage());
 		}
+
+		return $response;
 	}
 
 	public function readLine($inputLine = null)

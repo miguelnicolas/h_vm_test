@@ -1,9 +1,8 @@
 <?php
 
-$container = require __DIR__ . '/config/bootstrap.php';
+require __DIR__ . '/config/bootstrap.php';
 
-use App\Controllers\ConsoleController;
+use App\Interfaces\Console;
 
-
-$console = new ConsoleController;
+$console = new Console;
 $console->run();

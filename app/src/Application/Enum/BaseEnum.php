@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;
+namespace App\Application\Enum;
 
 abstract class BaseEnum {
 
