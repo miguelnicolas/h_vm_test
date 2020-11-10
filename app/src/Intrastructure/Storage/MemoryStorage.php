@@ -3,9 +3,9 @@
 namespace App\Infrastructure\Storage;
 
 use App\Infrastructure\StorageInterface;
-use App\Infrastructure\BaseStorage;
+use App\Infrastructure\Storage;
 
-class MemoryStorage extends BaseStorage implements StorageInterface
+class MemoryStorage extends Storage implements StorageInterface
 {
 	private $store = [];
 

@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Storage;
 
-abstract class BaseStorage
+abstract class Storage
 {
 	private static $instance;
 
