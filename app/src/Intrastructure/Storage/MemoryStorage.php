@@ -2,8 +2,8 @@
 
 namespace App\Infrastructure\Storage;
 
-use App\Infrastructure\StorageInterface;
-use App\Infrastructure\Storage;
+use App\Infrastructure\Storage\StorageInterface;
+use App\Infrastructure\Storage\Storage;
 
 class MemoryStorage extends Storage implements StorageInterface
 {
@@ -32,7 +32,7 @@ class MemoryStorage extends Storage implements StorageInterface
 		foreach($this->store[$dataset] as $key => $dataValue) {
 			if($dataValue == $value) {
 				$count++;
-				$return[$key] => $value;
+				$return[$key] = $value;
 
 				if($qty != -1 && $count == $qty) {
 					break;
@@ -61,7 +61,7 @@ class MemoryStorage extends Storage implements StorageInterface
 	{
 		!is_array($keys) && $keys = array($keys);
 		foreach($keys as $key) {
-			@unset($this->store[$dataset][$key]);
+			unset($this->store[$dataset][$key]);
 		}
 	}
 }

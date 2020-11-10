@@ -8,8 +8,9 @@ abstract class Storage
 
 	public static function getInstance(): StorageInterface
 	{
-        if (!self::$instance instanceof self) {
-            self::$instance = new self();
+        $class = '\\'.get_called_class();
+        if (!self::$instance instanceof $class) {
+            self::$instance = new $class();
         }
 
         return self::$instance;
