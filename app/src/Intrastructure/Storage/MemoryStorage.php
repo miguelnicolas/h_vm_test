@@ -22,13 +22,6 @@ class MemoryStorage extends Storage implements StorageInterface
 		return $count;
 	}
 
-	public function add($dataset, $value): bool
-	{
-		!array_key_exists($dataset, $this->store) && $this->store[$dataset] = [];
-		array_push($this->store[$dataset], $value);
-		return true;
-	}
-
 	public function get($dataset, $value, int $qty = 1): array
 	{
 		$return = [];
@@ -47,6 +40,21 @@ class MemoryStorage extends Storage implements StorageInterface
 			}
 		}
 		return $return;
+	}
+
+	public function getAll($dataset): array
+	{
+		if(!array_key_exists($dataset, $this->store)) {
+			return $return;
+		}
+		return $this->store[$dataset];
+	}
+
+	public function add($dataset, $value): bool
+	{
+		!array_key_exists($dataset, $this->store) && $this->store[$dataset] = [];
+		array_push($this->store[$dataset], $value);
+		return true;
 	}
 
 	public function remove($dataset, $keys): void
