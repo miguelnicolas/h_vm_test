@@ -3,8 +3,9 @@
 namespace App\Infrastructure\Storage;
 
 use App\Infrastructure\StorageInterface;
+use App\Infrastructure\BaseStorage;
 
-class MemoryStorage implements StorageInterface
+class MemoryStorage extends BaseStorage implements StorageInterface
 {
 	private $store = [];
 
@@ -31,22 +32,28 @@ class MemoryStorage implements StorageInterface
 	public function get($dataset, $value, int $qty = 1): array
 	{
 		$return = [];
-		if(!array_key_exists($dataset, $this->store) || $qty < 1) {
+		if(!array_key_exists($dataset, $this->store) || ($qty < 1 && $qty != -1)) {
 			return $return;
 		}
-		foreach($this->store[$dataset] as $id => $dataValue) {
+		$count = 0;
+		foreach($this->store[$dataset] as $key => $dataValue) {
 			if($dataValue == $value) {
-				$return[$id] => 
+				$count++;
+				$return[$key] => $value;
+
+				if($qty != -1 && $count == $qty) {
+					break;
+				}
 			}
 		}
 		return $return;
 	}
 
-	public function remove($dataset, $ids): void
+	public function remove($dataset, $keys): void
 	{
-		!is_array($ids) && $ids = array($ids);
-		foreach($ids as $id) {
-			@unset($this->store[$dataset][$id]);
+		!is_array($keys) && $keys = array($keys);
+		foreach($keys as $key) {
+			@unset($this->store[$dataset][$key]);
 		}
 	}
 }
