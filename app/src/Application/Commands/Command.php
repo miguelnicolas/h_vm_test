@@ -18,13 +18,8 @@ abstract class Command
     	return $this->commandInput;
     }
 
-    public function execute(): string
-    {
-    	return '';
-    }
-
     public function isHelpOption(): bool
     {
-    	return ($this->commandInput->getSubject() === CommandInput::HELP_OPTION);
+    	return ($this->commandInput->getOption() === CommandInput::HELP_OPTION);
     }
 }

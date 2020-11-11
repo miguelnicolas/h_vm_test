@@ -4,6 +4,7 @@ namespace App\Interfaces;
 
 use App\Application\Commands\CommandInput;
 use App\Application\Commands\CommandFactory;
+use App\Application\Commands\Services\CommandParser;
 use App\Application\Commands\Enum\ApiActions;
 
 class Console
@@ -29,10 +30,13 @@ class Console
 	public function execute()
 	{
 		try {
-			$commandInput = new CommandInput($this->inputLine);
+			/**
+			 * @todo DI container
+			 */
+			$commandInput = new CommandInput(new CommandParser, $this->inputLine);
 			$response = CommandFactory::getCommandFromInput($commandInput)->execute();
 		} catch (\Exception $e) {
-			$this->output($e->getMessage());
+			$response = $e->getMessage();
 		}
 
 		return $response;

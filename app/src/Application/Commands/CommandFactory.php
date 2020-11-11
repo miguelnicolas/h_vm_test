@@ -10,6 +10,7 @@ class CommandFactory
 	public static function getCommandFromInput(CommandInput $commandInput): CommandInterface
 	{
 		$commandActionName = 'App\\Application\\Commands\\CommandAction'.$commandInput->getCamelCaseKeyword();
+		
 		if(!class_exists($commandActionName)) {
 			throw new Exceptions\NotFoundCommandException($commandInput);
 		}
