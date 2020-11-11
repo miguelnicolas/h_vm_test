@@ -7,6 +7,14 @@ use \Exception;
 abstract class BaseException extends Exception
 {
     /**
+     * @var array
+     */
+    private $colorModifiers = [
+        'DEFAULT' => "\033[39m",
+        'ERROR' => "\033[31m",
+        'WARNING' => "\033[33m"
+    ];
+    /**
      * @var int
      */
     protected $defaultCode = 500;
@@ -44,8 +52,17 @@ abstract class BaseException extends Exception
         return $error;
     }
 
-    protected function getErrorHeader($code)
+    protected function getColorModifier($code = 'DEFAULT'): string
     {
-        return "\033[31mERROR ".$code.PHP_EOL."\033[39m";
+        $code = strtoupper($code);
+        if(!array_key_exists($code, $this->colorModifiers)) {
+            return '';
+        }
+        return $this->colorModifiers[$code];
+    } 
+
+    protected function getErrorHeader($code): string
+    {
+        return '';
     }
 }
