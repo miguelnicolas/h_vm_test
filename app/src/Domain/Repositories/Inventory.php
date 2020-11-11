@@ -2,14 +2,14 @@
 
 namespace App\Domain\Repositories;
 
+use App\Infrastructure\Storage\Storage;
+
 abstract class Inventory
 {
 	private $dataset;
-	private $store;
 
-	public function __construct(StorageInterface $store, string $dataset)
+	public function __construct(string $dataset)
 	{
-		$this->store = $store;
 		$this->dataset = $dataset;
 	}
 
@@ -18,14 +18,14 @@ abstract class Inventory
 		return $this->dataset;
 	}
 
-	public function store(): StorageInterface
+	public function store(): Storage
 	{
-		return $this->store;
+		return Storage();
 	}
 
 	public function getStock($value): int
 	{
-		return $this->store->count($this->dataset, $value) >= $qty;
+		return $this->store()->count($this->dataset, $value) >= $qty;
 	}
 
 	public function hasStock($value, $qty): bool
@@ -35,14 +35,14 @@ abstract class Inventory
 
 	public function getAllInventory(): array
 	{
-		return $this->store->getAll($this->dataset);
+		return $this->store()->getAll($this->dataset);
 	}
 
 	public function incrementStock($value, int $qty = 1): bool
 	{
 		if($qty >= 1) {
 			for($i = 1; $i <= $qty; $i++) {
-				$this->store->add($this->dataset, $value);
+				$this->store()->add($this->dataset, $value);
 			}
 		}
 		return true;
@@ -50,11 +50,17 @@ abstract class Inventory
 
 	public function decrementStock($value, int $qty = 1): bool
 	{
-		$items = $this->store->get($this->dataset, $value, $qty);
+		$items = $this->store()->get($this->dataset, $value, $qty);
 
 		if(!empty($items)) {
-			$this->store->remove($this->dataset, array_keys($items));
+			$this->store()->remove($this->dataset, array_keys($items));
 		}
 		return true;
+	}
+
+	public function getStatusSummary()
+	{
+		$inventory = $this->getAllInventory();
+
 	}
 }

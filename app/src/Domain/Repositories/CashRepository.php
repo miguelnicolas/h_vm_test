@@ -3,19 +3,27 @@
 namespace App\Domain\Repositories;
 
 use App\Domain\Repositories\Inventory;
+use App\Infrastructure\Storage\MemoryStorage;
 
 /**
- * Represents the cash inserted in the machine
+ * Represents the cash inserted into the machine
  */
 class CashRepository extends Inventory
 {
-	public function __construct(StorageInterface $storage)
+	public function __construct()
 	{
-		parent::__construct($storage, 'CASH');
+		parent::__construct('CASH');
+	}
+
+	public function addCoins(array $coins)
+	{
+		foreach($coins as $coin) {
+			$this->incrementStock($coin);
+		}
 	}
 
 	public function getCashTotal() {
-		$items = $this->getAll();
+		$items = $this->getAllInventory();
 		return array_sum($items);
 	}
 }
