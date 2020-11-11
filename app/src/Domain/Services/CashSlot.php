@@ -15,6 +15,7 @@ class CashSlot
 	{
 		$this->coins = $coins;
 		$this->validator = $validator;
+		$this->validator->setValidValues(ValidCoins::getValidValues());
 	}
 
 	public function isEmpty(): bool
