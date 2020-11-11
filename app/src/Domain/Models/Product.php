@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Models
+namespace App\Domain\Models;
 
 class Product
 {
@@ -11,7 +11,7 @@ class Product
     public function __construct($name, $price)
     {
         $this->name = $name;
-        $this->price = $price;
+        $this->price = floatval($price);
     }
 
     public function getName()
