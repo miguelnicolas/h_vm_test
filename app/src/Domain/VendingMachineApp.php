@@ -6,7 +6,9 @@ use App\Application\Helpers\Singleton;
 use App\Domain\Repositories;
 use App\Domain\Models\Product;
 use App\Domain\Services\CashSlot;
+use App\Domain\Services\Display;
 use App\Infrastructure\Storage\MemoryStorage;
+use App\Domain\Exceptions\InvalidCoinException;
 
 final class VendingMachineApp
 {
@@ -24,12 +26,14 @@ final class VendingMachineApp
 	 */
 	private final function __construct(Repositories\CashRepository $cashRepository,
 							Repositories\CoinRepository $coinRepository,
-							Repositories\ProductRepository $productRepository
+							Repositories\ProductRepository $productRepository,
+							Display $display
 							)
 	{
 		$this->cashRepository = $cashRepository;
 		$this->coinRepository = $coinRepository;
 		$this->productRepository = $productRepository;
+		$this->display = $display;
 
 		$this->init([
 			new Product('WATER', 0.65),
@@ -38,46 +42,70 @@ final class VendingMachineApp
 		]);
 	}
 
+/* PUBLIC API */
+
+	public function getProduct(CashSlot $cashSlot, $productName): self
+	{
+	}
+
+	public function insertMoney(CashSlot $cashSlot): self
+	{
+		try {
+			$cashSlot->validate();
+		} catch (InvalidCoinException $e) {
+			$this->display->addMessage($e->getMessage());
+		}
+
+		$validCoins = $cashSlot->getValidCoins();
+		if(!empty($validCoins)) {
+			// Adding valid coins to the user credit
+			$this->cashRepository->addCoins($validCoins);
+		}
+		$this->credit();
+
+		return $this;
+	}
+
+	public function returnCoin(): self
+	{
+	}
+
+	public function credit(): self
+	{
+	}
+
+	public function service(): self
+	{
+	}
+
+	public function status(): self
+	{
+	}
+
+	public function getResponse(): string
+	{
+		return $this->display->flush();
+	}
+
+/* end PUBLIC API */
+
 	private function init(array $productsCatalog) 
 	{
 		foreach($productsCatalog as $product){
 			$this->productRepository->addProductToCatalog($product);
 		}
 	}
-
-	public function getProduct(CashSlot $cashSlot, $productName)
-	{
-		if(!$cashSlot->isEmpty()) {
-			$this->insertMoney($cashSlot);
-		}
-	}
-
-	public function insertMoney(CashSlot $cashSlot)
-	{
-
-	}
-
-	public function returnCoin()
-	{
-	}
-
-	public function service()
-	{
-	}
-
-	public function status()
-	{
-	}
-
+	
 	private static function getNewInstance(): VendingMachineApp
 	{
         $class = self::class;
-    	$memoryStorage = Storage();
+    	$memoryStorage = MemoryStorage::getInstance();
 
         return new $class(
         	new Repositories\CashRepository() ,
         	new Repositories\CoinRepository(),
-        	new Repositories\ProductRepository()
+        	new Repositories\ProductRepository(),
+        	new Display
         );
 	}
 }

@@ -5,6 +5,8 @@ namespace App\Application\Commands;
 use App\Application\Commands\CommandInterface;
 use App\Application\Commands\Command;
 use App\Application\Commands\CommandInput;
+use App\Domain\Services\CashSlot;
+use App\Domain\Validators\CoinValidator;
 
 class CommandActionInsertMoney extends Command implements CommandInterface
 {
@@ -19,7 +21,11 @@ class CommandActionInsertMoney extends Command implements CommandInterface
         if($this->isHelpOption()) {
             return $this->getHelpEntry();
         }
-        $response = '';
+
+        $cashSlot = new CashSlot($this->getCommandInput()->getArguments(), new CoinValidator());
+        $response = App()
+                        ->insertMoney($cashSlot)
+                        ->getResponse();
         return $response;
     }
 
