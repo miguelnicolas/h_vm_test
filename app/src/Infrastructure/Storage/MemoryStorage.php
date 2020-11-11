@@ -45,7 +45,7 @@ class MemoryStorage extends Storage implements StorageInterface
 	public function getAll($dataset): array
 	{
 		if(!array_key_exists($dataset, $this->store)) {
-			return $return;
+			return [];
 		}
 		return $this->store[$dataset];
 	}
@@ -63,5 +63,12 @@ class MemoryStorage extends Storage implements StorageInterface
 		foreach($keys as $key) {
 			unset($this->store[$dataset][$key]);
 		}
+	}
+
+	public function flush($dataset): array
+	{
+		$return = $this->store[$dataset];
+		$this->store[$dataset] = [];
+		return $return;
 	}
 }

@@ -9,4 +9,5 @@ interface StorageInterface
 	public function getAll(string $dataset): array;
 	public function add(string $dataset, $value): bool;
 	public function remove(string $dataset, $ids): void;
+	public function flush(string $dataset): array;
 }

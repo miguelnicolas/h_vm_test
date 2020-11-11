@@ -38,6 +38,11 @@ abstract class Inventory
 		return $this->store()->getAll($this->dataset);
 	}
 
+	public function flush(): array
+	{
+		return $this->store()->flush($this->dataset);
+	}
+
 	public function incrementStock($value, int $qty = 1): bool
 	{
 		if($qty >= 1) {
