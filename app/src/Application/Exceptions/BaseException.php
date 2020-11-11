@@ -2,9 +2,9 @@
 
 namespace App\Application\Exceptions;
 
-use Exception;
+use \Exception;
 
-class BaseException extends \Exception
+abstract class BaseException extends Exception
 {
     /**
      * @var int
