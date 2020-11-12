@@ -48,38 +48,62 @@ final class VendingMachineApp
 	{
 	}
 
+	/**
+	 * Stores the coins inserted
+	 * @param  CashSlot $cashSlot
+	 * @return VendingMachineApp
+	 */
 	public function insertMoney(CashSlot $cashSlot): self
 	{
+		// User could have executed INSERT-MONEY command without arguments
+		if($cashSlot->isEmpty()) {
+			return $this;
+		}
+
 		try {
 			$cashSlot->validate();
 		} catch (InvalidCoinException $e) {
 			$this->display->addMessage($e->getMessage());
 		}
 
+		// Execution keeps going because user could have inserted valid coins, even
+		// if there are invalid ones
+
 		$validCoins = $cashSlot->getValidCoins();
 		if(!empty($validCoins)) {
 			// Adding valid coins to the user credit
 			$this->cashRepository->addCoins($validCoins);
 		}
-		$this->credit();
 
 		return $this;
 	}
 
 	public function returnCoin(): self
 	{
+		if($this->cashRepository->isEmpty()) {
+			$this->display->nothingToReturnMessage();
+		} else {
+			$coins = $this->cashRepository->flush();
+			$this->display->addReturnCoinMessage($coins);
+		}
+
+		return $this;
 	}
 
 	public function credit(): self
 	{
+		$this->display->addUserCreditMessage($this->cashRepository->getCashTotal());
+		return $this;
 	}
 
 	public function service(): self
 	{
+		return $this;
 	}
 
 	public function status(): self
 	{
+		return $this;
 	}
 
 	public function getResponse(): string
@@ -95,7 +119,7 @@ final class VendingMachineApp
 			$this->productRepository->addProductToCatalog($product);
 		}
 	}
-	
+
 	private static function getNewInstance(): VendingMachineApp
 	{
         $class = self::class;

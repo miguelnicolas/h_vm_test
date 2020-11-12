@@ -5,10 +5,8 @@ namespace App\Application\Commands;
 use App\Application\Commands\CommandInterface;
 use App\Application\Commands\Command;
 use App\Application\Commands\CommandInput;
-use App\Domain\Services\CashSlot;
-use App\Domain\Validators\CoinValidator;
 
-class CommandActionReturnCoin extends Command implements CommandInterface
+class CommandActionCredit extends Command implements CommandInterface
 {
 
     public function __construct(CommandInput $commandInput)
@@ -21,21 +19,17 @@ class CommandActionReturnCoin extends Command implements CommandInterface
         if($this->isHelpOption()) {
             return $this->getHelpEntry();
         }
-        
-        $cashSlot = new CashSlot($this->getCommandInput()->getArguments(), 
-                                 new CoinValidator());
 
         $response = App()
-                        ->insertMoney($cashSlot) // User could have inserted some coins in the same command
-                        ->returnCoin() // Return all cash inserted by user
+                        ->credit() // Calculates the credit
                         ->getResponse(); // Get response to show to user
         return $response;
     }
 
     public function getHelpEntry(): string
     {
-        return 'Returns all the coins in the money slot.'.PHP_EOL.PHP_EOL.
+        return 'Displays user\'s credit'.PHP_EOL.PHP_EOL.
                 'Usage:'.PHP_EOL.
-                'RETURN-COIN'.PHP_EOL; 
+                'CREDIT'.PHP_EOL; 
     }
 }

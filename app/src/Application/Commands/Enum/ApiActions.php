@@ -12,4 +12,5 @@ abstract class ApiActions extends BaseEnum
 	const GET = 'GET';
 	const SERVICE = 'SERVICE';
 	const STATUS = 'STATUS';
+	const CREDIT = 'CREDIT';
 }

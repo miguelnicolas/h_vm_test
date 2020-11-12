@@ -22,10 +22,12 @@ class CommandActionInsertMoney extends Command implements CommandInterface
             return $this->getHelpEntry();
         }
 
-        $cashSlot = new CashSlot($this->getCommandInput()->getArguments(), new CoinValidator());
+        $cashSlot = new CashSlot($this->getCommandInput()->getArguments(), 
+                                 new CoinValidator());
         $response = App()
-                        ->insertMoney($cashSlot)
-                        ->getResponse();
+                        ->insertMoney($cashSlot) // User inserted coins
+                        ->credit() // Calculates the credit
+                        ->getResponse(); // Get response to show to user
         return $response;
     }
 
