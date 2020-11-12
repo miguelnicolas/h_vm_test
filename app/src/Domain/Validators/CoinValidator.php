@@ -7,9 +7,8 @@ use App\Domain\Enum\ValidCoins;
 
 class CoinValidator extends Validator
 {
-	public function __construct(array $validValues = null)
+	public function __construct(array $validValues)
 	{
-		empty($validValues) && $validValues = ValidCoins::getValidValues();
 		$this->validValues = $validValues;
 	}
 }

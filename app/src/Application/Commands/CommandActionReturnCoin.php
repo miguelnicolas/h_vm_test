@@ -3,12 +3,12 @@
 namespace App\Application\Commands;
 
 use App\Application\Commands\CommandInterface;
-use App\Application\Commands\Command;
+use App\Application\Commands\CommandAction;
 use App\Application\Commands\CommandInput;
 use App\Domain\Services\CashSlot;
 use App\Domain\Validators\CoinValidator;
 
-class CommandActionReturnCoin extends Command implements CommandInterface
+class CommandActionReturnCoin extends CommandAction implements CommandInterface
 {
 
     public function __construct(CommandInput $commandInput)
@@ -22,10 +22,8 @@ class CommandActionReturnCoin extends Command implements CommandInterface
             return $this->getHelpEntry();
         }
         
-        $cashSlot = new CashSlot($this->getCommandInput()->getArguments(), 
-                                 new CoinValidator);
         $response = App()
-                        ->insertMoney($cashSlot) // User could have inserted some coins in the same command
+                        ->insertMoney($this->getCommandInput()->getArguments()) // User could have inserted some coins in the same command
                         ->returnCoin() // Return all cash inserted by user
                         ->getResponse(); // Get response to show to user
         return $response;

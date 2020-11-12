@@ -3,14 +3,10 @@
 namespace App\Application\Commands;
 
 use App\Application\Commands\CommandInterface;
-use App\Application\Commands\Command;
+use App\Application\Commands\CommandAction;
 use App\Application\Commands\CommandInput;
-use App\Domain\Services\CoinSlot;
-use App\Domain\Services\ProductSlot;
-use App\Domain\Validators\CoinValidator;
-use App\Domain\Validators\ProductValidator;
 
-class CommandActionService extends Command implements CommandInterface
+class CommandActionService extends CommandAction implements CommandInterface
 {
 
     public function __construct(CommandInput $commandInput)
@@ -24,15 +20,10 @@ class CommandActionService extends Command implements CommandInterface
             return $this->getHelpEntry();
         }
 
-        $coinSlot = new CoinSlot($this->getCommandInput()->getArguments()['COINS'], 
-                                 new CoinValidator);
-
-        $productValidator = new ProductValidator(App()->productRepository->getCatalogProductNames());
-        $productSlot = new ProductSlot($this->getCommandInput()->getArguments()['PRODUCTS'], 
-                                       $productValidator);
-
         $response = App()
-                        ->service($coinSlot, $productSlot)
+                        ->service(
+                            $this->getCommandInput()->getArguments()['COINS'], 
+                            $this->getCommandInput()->getArguments()['PRODUCTS'])
                         ->getResponse();
         return $response;
     }

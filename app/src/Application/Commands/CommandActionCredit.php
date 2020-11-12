@@ -3,10 +3,10 @@
 namespace App\Application\Commands;
 
 use App\Application\Commands\CommandInterface;
-use App\Application\Commands\Command;
+use App\Application\Commands\CommandAction;
 use App\Application\Commands\CommandInput;
 
-class CommandActionCredit extends Command implements CommandInterface
+class CommandActionCredit extends CommandAction implements CommandInterface
 {
 
     public function __construct(CommandInput $commandInput)

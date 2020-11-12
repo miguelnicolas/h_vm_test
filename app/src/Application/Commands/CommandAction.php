@@ -4,7 +4,7 @@ namespace App\Application\Commands;
 
 use App\Application\Commands\CommandInput;
 
-abstract class Command
+abstract class CommandAction
 {
 	private $commandInput;
 

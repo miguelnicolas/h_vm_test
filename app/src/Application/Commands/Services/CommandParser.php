@@ -73,7 +73,7 @@ class CommandParser extends BaseCommandParser
 		}
 	}
 
-	private function sanitizeArguments($arguments) {
+	private function sanitizeArguments(array $arguments = []) {
 		foreach($arguments as $i => $value) {
 			$value = preg_replace('/[\s,]/', '', $value);
 			is_numeric($value) && $value = floatval($value);

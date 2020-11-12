@@ -13,28 +13,27 @@ class ProductRepository extends Inventory
 {
 	private $catalog = [];
 
-	public function __construct()
+	public function __construct(array $products = [])
 	{
+		$this->catalog = $products;
 		parent::__construct('PRODUCTS');
 	}
 
 	public function addProductToCatalog(Product $product): void
 	{
-		if(!$this->isInCatalog($product)){
+		if(is_null($this->getProductByName($product->getName()))) {
 			array_push($this->catalog, $product);
 		}
 	}
 
-	public function isInCatalog(Product $product): bool
+	public function getProductByName($productName): ?Product
 	{
-		$isPresent = false;
-		foreach($this->catalog as $productInCatalog) {
-			if($product->getName() == $productInCatalog->getName()) {
-				$isPresent = true;
-				break;
+		foreach($this->catalog as $product) {
+			if($productName == $product->getName()) {
+				return $product;
 			}
 		}
-		return $isPresent;
+		return null;
 	}
 
 	public function getCatalogProductNames(): array

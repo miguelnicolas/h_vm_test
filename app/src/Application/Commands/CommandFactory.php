@@ -7,6 +7,10 @@ use App\Application\Commands\Exceptions;
 
 class CommandFactory
 {
+	/**
+	 * @param  CommandInput $commandInput [description]
+	 * @return CommandAction
+	 */
 	public static function getCommandFromInput(CommandInput $commandInput): CommandInterface
 	{
 		$commandActionName = 'App\\Application\\Commands\\CommandAction'.$commandInput->getCamelCaseKeyword();
@@ -14,7 +18,6 @@ class CommandFactory
 		if(!class_exists($commandActionName)) {
 			throw new Exceptions\NotFoundCommandException($commandInput);
 		}
-
 		$commandAction = new $commandActionName($commandInput);
 
 		return $commandAction;

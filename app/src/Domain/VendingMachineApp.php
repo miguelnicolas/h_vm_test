@@ -3,17 +3,19 @@
 namespace App\Domain;
 
 use App\Application\Helpers\Singleton;
-use App\Domain\Repositories;
+use App\Domain\Repositories\CashRepository;
+use App\Domain\Repositories\CoinRepository;
+use App\Domain\Repositories\ProductRepository;
+use App\Domain\Enum\ValidCoins;
 use App\Domain\Models\Product;
 use App\Domain\Services\BaseSlot;
 use App\Domain\Services\CoinSlot;
 use App\Domain\Services\CashSlot;
 use App\Domain\Services\ProductSlot;
 use App\Domain\Services\Display;
-use App\Domain\Exceptions\InvalidCashException;
-use App\Domain\Exceptions\InvalidCoinException;
-use App\Domain\Exceptions\InvalidProductException;
-use App\Domain\Exceptions\SomethingWentWrongException;
+use App\Domain\Services\ChangeDispenser;
+use App\Domain\Validators;
+use App\Domain\Exceptions;
 
 final class VendingMachineApp
 {
@@ -22,50 +24,53 @@ final class VendingMachineApp
 	public $cashRepository;
 	public $coinRepository;
 	public $productRepository;
+	private $cashSlot;
+	private $coinSlot;
+	private $productSlot;
+	private $display;
+	private $changeDispenser;
 
 	/**
 	 * @todo DI container, please!!
-	 * @param Repositories\CashRepository    $cashRepository    
-	 * @param Repositories\CoinRepository    $coinRepository    
-	 * @param Repositories\ProductRepository $productRepository 
+	 * @param CashRepository    $cashRepository    
+	 * @param CoinRepository    $coinRepository    
+	 * @param ProductRepository $productRepository 
 	 */
-	private final function __construct(Repositories\CashRepository $cashRepository,
-									   Repositories\CoinRepository $coinRepository,
-									   Repositories\ProductRepository $productRepository,
-									   Display $display
+	private final function __construct(CashRepository $cashRepository,
+									   CoinRepository $coinRepository,
+									   ProductRepository $productRepository,
+									   CoinSlot $coinSlot,
+									   CashSlot $cashSlot,
+									   ProductSlot $productSlot,
+									   Display $display,
+									   ChangeDispenser $changeDispenser
 									)
 	{
 		$this->cashRepository = $cashRepository;
 		$this->coinRepository = $coinRepository;
 		$this->productRepository = $productRepository;
+		$this->coinSlot = $coinSlot;
+		$this->cashSlot = $cashSlot;
+		$this->productSlot = $productSlot;
 		$this->display = $display;
-
-		$this->init([
-			new Product('WATER', 0.65),
-			new Product('JUICE', 1),
-			new Product('SODA', 1.50)
-		]);
+		$this->changeDispenser = $changeDispenser;
 	}
 
 /* PUBLIC API */
 
-	public function getProduct(CashSlot $cashSlot, $productName): self
-	{
-	}
-
 	/**
 	 * Stores the coins inserted
-	 * @param  CashSlot $cashSlot
+	 * @param  array $coins
 	 * @return VendingMachineApp
 	 */
-	public function insertMoney(CashSlot $cashSlot): self
+	public function insertMoney(array $coins = []): self
 	{
 		// User could have executed INSERT-MONEY command without arguments
-		if($cashSlot->isEmpty()) {
+		if(empty($coins)) {
 			return $this;
 		}
-
-		$addedCoins = $this->restock($cashSlot);
+		$this->cashSlot->setItems($coins);
+		$addedCoins = $this->restock($this->cashSlot);
 
 		return $this;
 	}
@@ -88,14 +93,16 @@ final class VendingMachineApp
 		return $this;
 	}
 
-	public function service(CoinSlot $coinSlot, ProductSlot $productSlot): self
+	public function service(array $coins = [], array $products = []): self
 	{
-		$restockedCoins = $this->restock($coinSlot);
+		$this->coinSlot->setItems($coins);
+		$restockedCoins = $this->restock($this->coinSlot);
 		if(!empty($restockedCoins)) {
 			$this->display->addSummaryMessage($restockedCoins, 'Coins added:');
 		}
 
-		$restockedProducts = $this->restock($productSlot);
+		$this->productSlot->setItems($products);
+		$restockedProducts = $this->restock($this->productSlot);
 		if(!empty($restockedProducts)) {
 			$this->display->addSummaryMessage($restockedProducts, 'Products added:');
 		}
@@ -149,7 +156,7 @@ final class VendingMachineApp
 						break;
 				}
 				if(is_null($repositoryAttributeName) || !property_exists(self::class, $repositoryAttributeName)) {
-					throw new SomethingWentWrongException();
+					throw new Exceptions\SomethingWentWrongException();
 				}
 
 				$this->$repositoryAttributeName->restock($restockItems);
@@ -158,22 +165,38 @@ final class VendingMachineApp
 		return $restockItems;
 	}
 
-	private function init(array $productsCatalog) 
-	{
-		foreach($productsCatalog as $product){
-			$this->productRepository->addProductToCatalog($product);
-		}
-	}
-
 	private static function getNewInstance(): VendingMachineApp
 	{
         $class = self::class;
 
+        $cashRepository = new CashRepository;
+        $coinRepository = new CoinRepository;
+        $productRepository = new ProductRepository([
+			new Product('WATER', 0.65),
+			new Product('JUICE', 1),
+			new Product('SODA', 1.50)
+		]);
+
+        $validCoins = ValidCoins::getValidValues();
+
+        $productValidator = new Validators\ProductValidator($productRepository->getCatalogProductNames());
+        $coinValidator = new Validators\CoinValidator($validCoins);
+
+    	$coinSlot = new CoinSlot($coinValidator);
+    	$cashSlot = new CashSlot($coinValidator);
+    	$productSlot = new ProductSlot($productValidator);
+    	$display = new Display;
+        $changeDispenser = new ChangeDispenser($validCoins);
+
         return new $class(
-        	new Repositories\CashRepository() ,
-        	new Repositories\CoinRepository(),
-        	new Repositories\ProductRepository(),
-        	new Display
+        	$cashRepository,
+        	$coinRepository,
+        	$productRepository,
+        	$coinSlot,
+        	$cashSlot,
+        	$productSlot,
+        	$display,
+        	$changeDispenser
         );
 	}
 }

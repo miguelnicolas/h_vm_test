@@ -3,10 +3,15 @@
 namespace App\Application\Commands;
 
 use App\Application\Commands\CommandInterface;
-use App\Application\Commands\Command;
+use App\Application\Commands\CommandAction;
 use App\Application\Commands\CommandInput;
+use App\Domain\Enum\ValidCoins;
+use App\Domain\Services\CashSlot;
+use App\Domain\Services\ChangeDispenser;
+use App\Domain\Validators\CoinValidator;
+use App\Domain\Validators\ProductValidator;
 
-class CommandActionGet extends Command implements CommandInterface
+class CommandActionGet extends CommandAction implements CommandInterface
 {
 
     public function __construct(CommandInput $commandInput)
@@ -19,8 +24,11 @@ class CommandActionGet extends Command implements CommandInterface
         if($this->isHelpOption()) {
             return $this->getHelpEntry();
         }
-        $response = '';
-        return $response;
+
+        $response = App()
+                        ->insertMoney($this->getCommandInput()->getArguments()) // User could have inserted some coins in the same command
+                        ->getProduct($this->getCommandInput()->getSubject()/*, $productDispenser*/) // Get product
+                        ->getResponse(); // Get response to show to user
     }
 
     public function getHelpEntry(): string
