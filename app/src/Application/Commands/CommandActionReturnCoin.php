@@ -23,8 +23,7 @@ class CommandActionReturnCoin extends Command implements CommandInterface
         }
         
         $cashSlot = new CashSlot($this->getCommandInput()->getArguments(), 
-                                 new CoinValidator());
-
+                                 new CoinValidator);
         $response = App()
                         ->insertMoney($cashSlot) // User could have inserted some coins in the same command
                         ->returnCoin() // Return all cash inserted by user
@@ -36,6 +35,6 @@ class CommandActionReturnCoin extends Command implements CommandInterface
     {
         return 'Returns all the coins in the money slot.'.PHP_EOL.PHP_EOL.
                 'Usage:'.PHP_EOL.
-                'RETURN-COIN'.PHP_EOL; 
+                ' RETURN-COIN'.PHP_EOL; 
     }
 }

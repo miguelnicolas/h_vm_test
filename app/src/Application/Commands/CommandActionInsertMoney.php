@@ -23,7 +23,7 @@ class CommandActionInsertMoney extends Command implements CommandInterface
         }
 
         $cashSlot = new CashSlot($this->getCommandInput()->getArguments(), 
-                                 new CoinValidator());
+                                 new CoinValidator);
         $response = App()
                         ->insertMoney($cashSlot) // User inserted coins
                         ->credit() // Calculates the credit
@@ -35,7 +35,7 @@ class CommandActionInsertMoney extends Command implements CommandInterface
     {
         return 'Inserts coins in the money slot.'.PHP_EOL.PHP_EOL.
                 'Usage:'.PHP_EOL.
-                '[coin_1], [coin_2], [...]'.PHP_EOL.
-                '[coin_1], [coin_2], [...], INSERT-COIN'.PHP_EOL; 
+                ' [coin_1], [coin_2], [...]'.PHP_EOL.
+                ' [coin_1], [coin_2], [...], INSERT-COIN'.PHP_EOL; 
     }
 }

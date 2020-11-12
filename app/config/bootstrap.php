@@ -15,3 +15,12 @@ function Storage()
 {
 	return MemoryStorage::getInstance();
 }
+
+/*use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+// creating an empty container builder
+$containerBuilder = new ContainerBuilder();
+
+dump($containerBuilder);
+
+$serviceContainer = require 'services.php';*/

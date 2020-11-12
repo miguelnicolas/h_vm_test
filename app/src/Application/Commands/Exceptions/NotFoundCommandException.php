@@ -4,7 +4,7 @@ namespace App\Application\Commands\Exceptions;
 
 use App\Application\Exceptions\BaseException;
 use App\Application\Commands\CommandInput;
-use App\Enums\ApiActions;
+use App\Application\Commands\Enum\ApiActions;
 
 class NotFoundCommandException extends BaseException
 {
@@ -20,7 +20,13 @@ class NotFoundCommandException extends BaseException
 
 	public function getErrorMessage()
 	{
-		print_r($this->commandInput);
-		return 'Command ['.$this->commandInput->getKeyword().'] not found. Available commands:'.PHP_EOL.implode(PHP_EOL, ApiActions::getValidValues());
+		return  $this->getColorModifier('ERROR').
+				'Command ['.$this->commandInput->getKeyword().'] not found.'.
+				$this->getColorModifier().PHP_EOL.
+				'Available commands:'.PHP_EOL.' '.implode(PHP_EOL.' ', ApiActions::getValidValues()).PHP_EOL.PHP_EOL.
+				'If you need help on how to use them, type the command name followed by --help'.PHP_EOL.
+				'Example:'.PHP_EOL.
+				' SERVICE --help'.PHP_EOL;
 	}
+
 }

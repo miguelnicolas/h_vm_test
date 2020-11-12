@@ -2,7 +2,6 @@
 
 namespace App\Application\Commands;
 
-use InvalidArgumentException;
 use App\Application\Commands\CommandInterface;
 use App\Application\Commands\Command;
 use App\Application\Commands\CommandInput;
@@ -20,13 +19,15 @@ class CommandActionGet extends Command implements CommandInterface
         if($this->isHelpOption()) {
             return $this->getHelpEntry();
         }
-
-        return '';
+        $response = '';
+        return $response;
     }
 
     public function getHelpEntry(): string
     {
-        return 'Usage:'.PHP_EOL.
-            '<coin_1>, <coin_2>, ..., GET-WATER'.PHP_EOL; 
+        return 'Gets a product from the machine and returns the change.'.PHP_EOL.PHP_EOL.
+                'Usage:'.PHP_EOL.
+                '[coin_1], [coin_2], [...], GET-WATER'.PHP_EOL.
+                'GET-WATER (if enough credit in the machine)'.PHP_EOL; 
     }
 }
