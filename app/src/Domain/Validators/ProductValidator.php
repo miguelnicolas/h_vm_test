@@ -3,13 +3,12 @@
 namespace App\Domain\Validators;
 
 use App\Domain\Validators\Validator;
-use App\Domain\Enum\ValidCoins;
 
-class CoinValidator extends Validator
+class ProductValidator extends Validator
 {
 	public function __construct(array $validValues = null)
 	{
-		empty($validValues) && $validValues = ValidCoins::getValidValues();
+		empty($validValues) && $validValues = App()->productRepository->getCatalogProductNames();
 		$this->validValues = $validValues;
 	}
 }

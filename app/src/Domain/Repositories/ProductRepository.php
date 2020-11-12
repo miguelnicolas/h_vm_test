@@ -36,4 +36,13 @@ class ProductRepository extends Inventory
 		}
 		return $isPresent;
 	}
+
+	public function getCatalogProductNames(): array
+	{
+		$productNames = [];
+		foreach($this->catalog as $product) {
+			array_push($productNames, $product->getName());
+		}
+		return $productNames;
+	}
 }
