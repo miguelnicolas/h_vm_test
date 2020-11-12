@@ -4,7 +4,7 @@ namespace App\Domain\Exceptions;
 
 use App\Domain\Exceptions\InvalidItemException;
 
-class InvalidCoinException extends InvalidItemException
+class InvalidCashException extends InvalidItemException
 {
 	public function getErrorMessage()
 	{
