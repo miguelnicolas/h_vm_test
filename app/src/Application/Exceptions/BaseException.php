@@ -21,7 +21,7 @@ abstract class BaseException extends Exception
     /**
      * @var int
      */
-    protected $defaultMessage = 'Something went wrong';
+    protected $defaultMessage = 'Something went wrong. Please contact the Technical Service';
     /**
      * @var null|Array
      */

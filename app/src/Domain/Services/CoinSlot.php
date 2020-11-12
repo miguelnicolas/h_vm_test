@@ -6,7 +6,6 @@ use App\Domain\Exceptions\InvalidCoinException;
 
 class CoinSlot extends BaseSlot
 {
-
 	/**
 	 * @return bool True
 	 * @throws InvalidCoinException

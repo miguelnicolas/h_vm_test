@@ -6,7 +6,6 @@ use App\Domain\Exceptions\InvalidProductException;
 
 class ProductSlot extends BaseSlot
 {
-
 	/**
 	 * @return bool True
 	 * @throws InvalidCoinException

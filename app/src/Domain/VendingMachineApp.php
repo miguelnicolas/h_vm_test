@@ -5,10 +5,15 @@ namespace App\Domain;
 use App\Application\Helpers\Singleton;
 use App\Domain\Repositories;
 use App\Domain\Models\Product;
+use App\Domain\Services\BaseSlot;
+use App\Domain\Services\CoinSlot;
 use App\Domain\Services\CashSlot;
+use App\Domain\Services\ProductSlot;
 use App\Domain\Services\Display;
-use App\Infrastructure\Storage\MemoryStorage;
+use App\Domain\Exceptions\InvalidCashException;
 use App\Domain\Exceptions\InvalidCoinException;
+use App\Domain\Exceptions\InvalidProductException;
+use App\Domain\Exceptions\SomethingWentWrongException;
 
 final class VendingMachineApp
 {
@@ -25,10 +30,10 @@ final class VendingMachineApp
 	 * @param Repositories\ProductRepository $productRepository 
 	 */
 	private final function __construct(Repositories\CashRepository $cashRepository,
-							Repositories\CoinRepository $coinRepository,
-							Repositories\ProductRepository $productRepository,
-							Display $display
-							)
+									   Repositories\CoinRepository $coinRepository,
+									   Repositories\ProductRepository $productRepository,
+									   Display $display
+									)
 	{
 		$this->cashRepository = $cashRepository;
 		$this->coinRepository = $coinRepository;
@@ -60,20 +65,7 @@ final class VendingMachineApp
 			return $this;
 		}
 
-		try {
-			$cashSlot->validate();
-		} catch (InvalidCoinException $e) {
-			$this->display->addMessage($e->getMessage());
-		}
-
-		// Execution keeps going because user could have inserted valid coins, even
-		// if there are invalid ones
-
-		$validCoins = $cashSlot->getValidCoins();
-		if(!empty($validCoins)) {
-			// Adding valid coins to the user credit
-			$this->cashRepository->addCoins($validCoins);
-		}
+		$addedCoins = $this->restock($cashSlot);
 
 		return $this;
 	}
@@ -96,13 +88,26 @@ final class VendingMachineApp
 		return $this;
 	}
 
-	public function service(): self
+	public function service(CoinSlot $coinSlot, ProductSlot $productSlot): self
 	{
+		$restockedCoins = $this->restock($coinSlot);
+		if(!empty($restockedCoins)) {
+			$this->display->addSummaryMessage($restockedCoins, 'Coins added:');
+		}
+
+		$restockedProducts = $this->restock($productSlot);
+		if(!empty($restockedProducts)) {
+			$this->display->addSummaryMessage($restockedProducts, 'Products added:');
+		}
+
 		return $this;
 	}
 
 	public function status(): self
 	{
+		$this->display->addSummaryMessage($this->cashRepository->getAllInventory(), 'Cash slot:');
+		$this->display->addSummaryMessage($this->coinRepository->getAllInventory(), 'Coins deposit:');
+		$this->display->addSummaryMessage($this->productRepository->getAllInventory(), 'Products:');
 		return $this;
 	}
 
@@ -112,6 +117,46 @@ final class VendingMachineApp
 	}
 
 /* end PUBLIC API */
+
+	private function restock(BaseSlot $slot): array
+	{
+		$restockItems = [];
+		if(!$slot->isEmpty()) {
+
+			try {
+				$slot->validate();
+			} catch (\Exception $e) {
+				$this->display->addMessage($e->getMessage());
+			}
+
+			// Execution keeps going because user could have inserted valid items, even
+			// if there are invalid ones
+			
+			$restockItems = $slot->getValidItems();
+			if(!empty($restockItems)) {
+				$repositoryAttributeName = null;
+
+				// Selecting the corresponding repository based on the Slot class
+				switch ((substr(get_class($slot), strrpos(get_class($slot), '\\') + 1))) {
+					case 'CashSlot':
+						$repositoryAttributeName = 'cashRepository';
+						break;
+					case 'CoinSlot':
+						$repositoryAttributeName = 'coinRepository';
+						break;
+					case 'ProductSlot':
+						$repositoryAttributeName = 'productRepository';
+						break;
+				}
+				if(is_null($repositoryAttributeName) || !property_exists(self::class, $repositoryAttributeName)) {
+					throw new SomethingWentWrongException();
+				}
+
+				$this->$repositoryAttributeName->restock($restockItems);
+			}
+		}
+		return $restockItems;
+	}
 
 	private function init(array $productsCatalog) 
 	{
@@ -123,7 +168,6 @@ final class VendingMachineApp
 	private static function getNewInstance(): VendingMachineApp
 	{
         $class = self::class;
-    	$memoryStorage = MemoryStorage::getInstance();
 
         return new $class(
         	new Repositories\CashRepository() ,

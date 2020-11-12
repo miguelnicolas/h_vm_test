@@ -15,13 +15,6 @@ class CashRepository extends Inventory
 		parent::__construct('CASH');
 	}
 
-	public function addCoins(array $coins)
-	{
-		foreach($coins as $coin) {
-			$this->incrementStock($coin);
-		}
-	}
-
 	public function getCashTotal() {
 		$items = $this->getAllInventory();
 		return array_sum($items);

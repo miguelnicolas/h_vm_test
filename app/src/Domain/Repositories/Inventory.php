@@ -48,6 +48,13 @@ abstract class Inventory
 		return $this->store()->isEmpty($this->dataset);
 	}
 
+	public function restock($values): void
+	{
+		foreach($values as $value) {
+			$this->incrementStock($value);
+		}
+	}
+
 	public function incrementStock($value, int $qty = 1): bool
 	{
 		if($qty >= 1) {

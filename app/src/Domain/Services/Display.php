@@ -3,7 +3,7 @@
 namespace App\Domain\Services;
 
 /**
- * @todo  This class is meant only for message management pourposes. Methods adding literal messages should be in other class
+ * @todo This class is meant only for message management pourposes. Methods adding literal messages should be in other class
  */
 class Display
 {
@@ -23,6 +23,11 @@ class Display
 		return $return;
 	}
 
+	public function addSummaryMessage(array $items, string $header = ''): void
+	{
+		$this->addMessage($header.PHP_EOL.$this->getGroupedValuesMessageSummary($items));
+	}
+
 	public function addUserCreditMessage(float $cashTotal): void
 	{
 		$this->addMessage('Your credit: '.$cashTotal);
@@ -36,5 +41,22 @@ class Display
 	public function nothingToReturnMessage(): void
 	{
 		$this->addMessage('No coins to return');
+	}
+
+	private function getGroupedValuesMessageSummary($items): string
+	{
+		$values = [];
+		foreach($items as $item) {
+			$item = strval($item);
+			if(!array_key_exists($item, $values)) {
+				$values[$item] = 0;
+			}
+			$values[$item]++;
+		}
+		$messageDetail = '';
+		foreach($values as $item => $qty) {
+			$messageDetail.= " $item\t => $qty".PHP_EOL;
+		}
+		return $messageDetail;
 	}
 }

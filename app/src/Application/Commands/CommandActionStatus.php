@@ -19,7 +19,9 @@ class CommandActionStatus extends Command implements CommandInterface
         if($this->isHelpOption()) {
             return $this->getHelpEntry();
         }
-        $response = '';
+        $response = App()
+                        ->status()
+                        ->getResponse();
         return $response;
     }
 
@@ -27,6 +29,6 @@ class CommandActionStatus extends Command implements CommandInterface
     {
         return 'Displays the Machine\'s status.'.PHP_EOL.PHP_EOL.
                 'Usage:'.PHP_EOL.
-                'STATUS'.PHP_EOL; 
+                ' STATUS'.PHP_EOL; 
     }
 }
