@@ -10,4 +10,5 @@ interface StorageInterface
 	public function add(string $dataset, $value): bool;
 	public function remove(string $dataset, $ids): void;
 	public function flush(string $dataset): array;
+	public function isEmpty(string $dataset): bool;
 }

@@ -43,6 +43,11 @@ abstract class Inventory
 		return $this->store()->flush($this->dataset);
 	}
 
+	public function isEmpty(): bool
+	{
+		return $this->store()->isEmpty($this->dataset);
+	}
+
 	public function incrementStock($value, int $qty = 1): bool
 	{
 		if($qty >= 1) {

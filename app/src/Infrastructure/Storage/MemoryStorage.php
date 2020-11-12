@@ -67,8 +67,16 @@ class MemoryStorage extends Storage implements StorageInterface
 
 	public function flush($dataset): array
 	{
+		if(!array_key_exists($dataset, $this->store)) {
+			return [];
+		}
 		$return = $this->store[$dataset];
 		$this->store[$dataset] = [];
 		return $return;
+	}
+
+	public function isEmpty($dataset): bool
+	{
+		return !(array_key_exists($dataset, $this->store) && !empty($this->store[$dataset]));
 	}
 }
