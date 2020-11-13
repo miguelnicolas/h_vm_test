@@ -4,7 +4,6 @@ namespace App\Domain\Repositories;
 
 use App\Domain\Repositories\Inventory;
 use App\Domain\Models\Product;
-use App\Infrastructure\Storage\MemoryStorage;
 
 /**
  * Represents the products in the machine

@@ -3,7 +3,6 @@
 namespace App\Domain\Repositories;
 
 use App\Domain\Repositories\Inventory;
-use App\Infrastructure\Storage\MemoryStorage;
 
 /**
  * Represents the change in the machine
