@@ -96,16 +96,10 @@ final class VendingMachineApp
 	public function service(array $coins = [], array $products = []): self
 	{
 		$this->coinSlot->setItems($coins);
-		$restockedCoins = $this->restock($this->coinSlot);
-		if(!empty($restockedCoins)) {
-			$this->display->addSummaryMessage($restockedCoins, 'Coins added:');
-		}
+		$restockedCoins = $this->restock($this->coinSlot, true);
 
 		$this->productSlot->setItems($products);
-		$restockedProducts = $this->restock($this->productSlot);
-		if(!empty($restockedProducts)) {
-			$this->display->addSummaryMessage($restockedProducts, 'Products added:');
-		}
+		$restockedProducts = $this->restock($this->productSlot, true);
 
 		return $this;
 	}
@@ -213,16 +207,13 @@ final class VendingMachineApp
 		$this->coinRepository->restock($cash);
 	}
 
-	private function restock(BaseSlot $slot): array
+	private function restock(BaseSlot $slot, bool $flush = false): array
 	{
 		$restockItems = [];
 		if(!$slot->isEmpty()) {
 
 			$slot->validate();
 
-			// Execution keeps going because user could have inserted valid items, even
-			// if there are invalid ones
-			
 			$restockItems = $slot->getValidItems();
 			if(!empty($restockItems)) {
 				$repositoryAttributeName = null;
@@ -243,6 +234,9 @@ final class VendingMachineApp
 					throw new Exceptions\SomethingWentWrongException();
 				}
 
+				if($flush) {
+					$this->$repositoryAttributeName->flush();
+				}
 				$this->$repositoryAttributeName->restock($restockItems);
 			}
 		}
