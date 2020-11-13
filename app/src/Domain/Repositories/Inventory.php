@@ -28,14 +28,9 @@ abstract class Inventory
 		return $this->store()->count($this->dataset, $value) >= $qty;
 	}
 
-	public function hasStock($value, $qty): bool
+	public function hasStock($value, $qty = 1): bool
 	{
 		return $this->getStock($value) >= $qty;
-	}
-
-	public function getAllInventory(): array
-	{
-		return $this->store()->getAll($this->dataset);
 	}
 
 	public function flush(): array
@@ -68,16 +63,28 @@ abstract class Inventory
 	public function decrementStock($value, int $qty = 1): bool
 	{
 		$items = $this->store()->get($this->dataset, $value, $qty);
-
 		if(!empty($items)) {
 			$this->store()->remove($this->dataset, array_keys($items));
 		}
 		return true;
 	}
 
-	public function getStatusSummary()
+	public function getAllInventory(): array
 	{
-		$inventory = $this->getAllInventory();
+		return $this->store()->getAll($this->dataset);
+	}
 
+	public function getAllInventoryGrouped(): array
+	{
+		$items = $this->getAllInventory();
+		$values = [];
+		foreach($items as $item) {
+			$item = strval($item);
+			if(!array_key_exists($item, $values)) {
+				$values[$item] = 0;
+			}
+			$values[$item]++;
+		}
+		return $values;
 	}
 }

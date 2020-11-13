@@ -19,7 +19,7 @@ abstract class InvalidItemException extends BaseException
 
 	public function getErrorMessage()
 	{
-		$message = $this->getColorModifier('WARNING').
+		$message = $this->getColorModifier('ERROR').
 			'Invalid item'.(count($this->invalidItems) > 1 ? 's' : '').': '.implode(', ',$this->invalidItems).PHP_EOL.
 			'Accepted types of items: '.implode(', ',$this->acceptedItems).
 			$this->getColorModifier();

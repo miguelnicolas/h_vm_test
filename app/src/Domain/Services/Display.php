@@ -43,6 +43,16 @@ class Display
 		$this->addMessage('No coins to return');
 	}
 
+	public function notEnoughChange(): void
+	{
+		$this->addMessage('Machine doesn\'t have enough change.');
+	}
+
+	public function productWithChangeMessage(string $productName, array $coins): void
+	{
+		$this->addMessage($productName.', '.implode(', ', $coins));
+	}
+
 	private function getGroupedValuesMessageSummary($items): string
 	{
 		$values = [];

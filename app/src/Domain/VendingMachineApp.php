@@ -113,8 +113,38 @@ final class VendingMachineApp
 	public function status(): self
 	{
 		$this->display->addSummaryMessage($this->cashRepository->getAllInventory(), 'Cash slot:');
-		$this->display->addSummaryMessage($this->coinRepository->getAllInventory(), 'Coins deposit:');
 		$this->display->addSummaryMessage($this->productRepository->getAllInventory(), 'Products:');
+		$this->display->addSummaryMessage($this->coinRepository->getAllInventory(), 'Coins deposit:');
+		return $this;
+	}
+
+	public function getProduct(string $productName): self
+	{
+		// get product specifications
+		$product = $this->getProductObject($productName);
+		// check product stock
+		$this->checkStock($productName);
+		// check enough credit
+		$this->checkCredit($product);
+		// get change coins
+		if(-1 == $changeCoins = $this->calculateChange($product)) {
+			$this->display->notEnoughChange();
+			return $this->returnCoin();
+		}
+
+		// moves money from cash slot to coins deposit
+		$this->cashToCoins();
+		// decrements the stock of the selected product
+		$this->removeProductFromStock($product);
+
+		if(!empty($changeCoins)) {
+			// decrements the stock of the coins in change
+			$this->removeChangeFromStock($changeCoins);
+			$this->display->productWithChangeMessage($product->getName(), $changeCoins);
+		} else {
+			$this->display->addMessage($product->getName());
+		}
+
 		return $this;
 	}
 
@@ -125,16 +155,70 @@ final class VendingMachineApp
 
 /* end PUBLIC API */
 
+	private function getProductObject(string $productName): Product
+	{
+		if(!($product = $this->productRepository->getProductByName($productName))) {
+			throw new Exceptions\ProductNotFoundException($productName);
+		}
+		return $product;
+	}
+
+	private function checkStock(string $productName): void
+	{
+		if(!$this->productRepository->hasStock($productName)) {
+			throw new Exceptions\ProductNoStockException($productName);
+		}
+	}
+
+	private function checkCredit(Product $product): void
+	{
+		$cashTotal = $this->cashRepository->getCashTotal();
+		if($product->getPrice() > $cashTotal) {
+			throw new Exceptions\NotEnoughMoneyException($product, $cashTotal);
+		}
+	}
+
+	private function removeProductFromStock(Product $product): void
+	{
+		$this->productRepository->decrementStock($product->getName());
+	}
+
+	private function removeChangeFromStock(array $coinsChange): void
+	{
+		foreach($coinsChange as $coin) {
+			$this->coinRepository->decrementStock($coin);
+		}
+	}
+
+	private function calculateChange(Product $product)
+	{
+		$coinsStock = $this->coinRepository->getAllInventoryGrouped();
+		// Adds the cash stock to the coins stock
+		foreach($this->cashRepository->getAllInventory() as $coin) {
+			$coin = strval($coin);
+			if(!isset($coinsStock[$coin])) {
+				$coinsStock[$coin] = 0;
+			}
+			$coinsStock[$coin]++;
+		}
+		$changeCoins = $this->changeDispenser->getChange($product->getPrice(), 
+										  				 floatval($this->cashRepository->getCashTotal()), 
+										  				 $coinsStock);
+		return $changeCoins;
+	}
+
+	private function cashToCoins(): void
+	{
+		$cash = $this->cashRepository->flush();
+		$this->coinRepository->restock($cash);
+	}
+
 	private function restock(BaseSlot $slot): array
 	{
 		$restockItems = [];
 		if(!$slot->isEmpty()) {
 
-			try {
-				$slot->validate();
-			} catch (\Exception $e) {
-				$this->display->addMessage($e->getMessage());
-			}
+			$slot->validate();
 
 			// Execution keeps going because user could have inserted valid items, even
 			// if there are invalid ones

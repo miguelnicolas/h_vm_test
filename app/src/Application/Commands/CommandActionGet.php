@@ -29,6 +29,7 @@ class CommandActionGet extends CommandAction implements CommandInterface
                         ->insertMoney($this->getCommandInput()->getArguments()) // User could have inserted some coins in the same command
                         ->getProduct($this->getCommandInput()->getSubject()/*, $productDispenser*/) // Get product
                         ->getResponse(); // Get response to show to user
+        return $response;
     }
 
     public function getHelpEntry(): string
