@@ -25,7 +25,7 @@ class MemoryStorage extends Storage implements StorageInterface
 	public function get($dataset, $value, int $qty = 1): array
 	{
 		$return = [];
-		if(!array_key_exists($dataset, $this->store) || ($qty < 1 && $qty != -1)) {
+		if(!array_key_exists($dataset, $this->store) || ($qty < 1 && $qty != -1)) {
 			return $return;
 		}
 		$count = 0;
