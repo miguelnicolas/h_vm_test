@@ -9,6 +9,8 @@ cd h_vm_test/docker/
 docker-compose up -d # bootsrap Docker container. It may take a while
 docker-compose exec app composer update
 ```
+
+** Probably you'll need a GitHub access token in order to composer to be able to download private repos. You can get one here: https://github.com/settings/tokens
 ## Run
 To access the Machine interface:
 ```sh
