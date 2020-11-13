@@ -7,7 +7,7 @@ use App\Domain\Validators\CoinValidator;
 /**
  * @covers App\Domain\Validators\CoinValidator
  */
-class CoinValidatorTest extends TestCase
+final class CoinValidatorTest extends TestCase
 {
     private $instance;
 
@@ -24,7 +24,7 @@ class CoinValidatorTest extends TestCase
     /**
      * @covers ::isValidCoin
      */
-    public function test_validCoin_validate_coin_1_true()
+    public function test_isValidCoin_validate_coin_1_true()
     {
         self::assertTrue($this->instance->isValidCoin(1));
     }
@@ -32,7 +32,7 @@ class CoinValidatorTest extends TestCase
     /**
      * @covers ::isValidCoin
      */
-    public function test_validCoin_validate_coin_5_false()
+    public function test_isValidCoin_validate_coin_5_false()
     {
         self::assertFalse($this->instance->isValidCoin(5));
     }

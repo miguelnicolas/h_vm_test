@@ -4,6 +4,9 @@ declare(strict_types=1);
 use PHPUnit\Framework\TestCase;
 use App\Infrastructure\Storage\MemoryStorage;
 
+/**
+ * @covers App\Infrastructure\Storage\MemoryStorage
+ */
 final class MemoryStorageTest extends TestCase
 {
     private $instance;
@@ -12,9 +15,7 @@ final class MemoryStorageTest extends TestCase
     {
         $this->instance = MemoryStorage::getInstance();
     }
-    /**
-     * @covers MemoryStorage
-     */
+    
     public function test_canBeInitializable()
     {
         self::assertInstanceOf(MemoryStorage::class, $this->instance);
