@@ -22,18 +22,18 @@ final class CoinValidatorTest extends TestCase
     }
 
     /**
-     * @covers ::isValidCoin
+     * @covers ::isValidValue
      */
-    public function test_isValidCoin_validate_coin_1_true()
+    public function test_isValidValue_validate_coin_1_true()
     {
-        self::assertTrue($this->instance->isValidCoin(1));
+        self::assertTrue($this->instance->isValidValue(1));
     }
 
     /**
-     * @covers ::isValidCoin
+     * @covers ::isValidValue
      */
-    public function test_isValidCoin_validate_coin_5_false()
+    public function test_isValidValue_validate_coin_5_false()
     {
-        self::assertFalse($this->instance->isValidCoin(5));
+        self::assertFalse($this->instance->isValidValue(5));
     }
 }
