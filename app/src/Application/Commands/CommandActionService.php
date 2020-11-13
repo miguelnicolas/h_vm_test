@@ -24,6 +24,7 @@ class CommandActionService extends CommandAction implements CommandInterface
                         ->service(
                             $this->getCommandInput()->getArguments()['COINS'], 
                             $this->getCommandInput()->getArguments()['PRODUCTS'])
+                        ->status()
                         ->getResponse();
         return $response;
     }
